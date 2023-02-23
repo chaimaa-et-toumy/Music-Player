@@ -1,5 +1,5 @@
 {
-  "name": "musicPlayer",
+  "name": "MusicPlayer",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -10,8 +10,18 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-community/masked-view": "^0.1.11",
+    "@react-native-community/slider": "^4.4.2",
+    "@react-navigation/native": "^6.1.4",
+    "@react-navigation/native-stack": "^6.9.10",
     "react": "18.2.0",
-    "react-native": "0.71.3"
+    "react-native": "0.71.3",
+    "react-native-gesture-handler": "^2.9.0",
+    "react-native-linear-gradient": "^2.6.2",
+    "react-native-reanimated": "^2.14.4",
+    "react-native-safe-area-context": "^4.5.0",
+    "react-native-screens": "^3.20.0",
+    "react-native-vector-icons": "^9.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
