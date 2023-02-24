@@ -1,125 +1,106 @@
-import { StyleSheet, Text, View, Image, ScrollView, FlatList, ImageBackground, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, Button, View, Image, ScrollView, FlatList, ImageBackground, TouchableOpacity, PermissionsAndroid, Platform } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
+import RNFS from 'react-native-fs';
+// import TrackPlayer from 'react-native-track-player';
 
-const fakeData = [
-  {
-    id: 1,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 2,
-    name: 'Faded',
-    singer: 'Alan Walker',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 3,
-    name: 'Ya Habibi',
-    singer: 'Mohamed Hamaki',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 4,
-    name: 'akhir el 3omr',
-    singer: 'Tamer Hosny',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 11,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 5,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 6,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 7,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 8,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 9,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 10,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-]
 
 const Playlist = ({ navigation }) => {
+
+  const [musicF, setMusic] = useState([]);
+  let data = []
+
+  const getMusicFiles = async () => {
+    try {
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+          {
+            title: 'Permission to access external storage',
+            message: 'This app needs access to your external storage to get music files.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          const items = await RNFS.readDir(RNFS.ExternalStorageDirectoryPath + '/Music');
+
+
+          if (!global.onetimelast) {
+            for (let item in items) {
+              let Lyrics = {
+                name: items[item]['name'].split('.')[0],
+              }
+              data.push(Lyrics)
+              console.log(items)
+            }
+            setMusic(data)
+            global.onetimelast = true
+          }
+        } else {
+          console.log('Storage permission denied');
+        }
+      } else {
+        const musicFiles = await RNFS.readDir(RNFS.ExternalStorageDirectoryPath);
+        return musicFiles;
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+
+  useEffect(() => {
+    getMusicFiles();
+  }, []);
+
+
   return (
 
-    <ImageBackground style={styles.container} source={require('../assets/images/imgs.png')}>
-      {/* nav bar */}
-      {/* <View style={styles.main}> */}
-      <View>
-        <View style={styles.navbar}>
-          <TouchableOpacity onPress={() =>
-            navigation.navigate('Home')}>
-            <Icon name="angle-left" size={35} color="white" />
-            {/* <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>Back</Text> */}
-          </TouchableOpacity>
-          <Entypo name="dots-three-horizontal" size={30} color="white" />
-        </View>
-      </View>
-
-      {/* song playlist */}
-      <View>
-        <Text style={styles.Playlist}>PlayList</Text>
-        <FlatList
-          data={fakeData}
-          keyExtractor={item => item.id}
-          contentContainerStyle={{
-            flexGrow: 1,
-            justifyContent: 'center',
-            width: '100%',
-            marginTop: 25
-          }}
-          renderItem={({ item }) => (
-            <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Main')}>
-              <View style={styles.fl_Directions}>
-                <Image source={item.img} style={{ height: 60, width: 60, borderRadius: 10, borderColor: 'white', borderWidth: 1 }} />
-                <View style={{ marginLeft: 15 }}>
-                  <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>{item.name}</Text>
-                  <Text style={{ color: '#A6A4A1', fontSize: 15, fontWeight: 'bold' }}>{item.singer}</Text>
-                </View>
-              </View>
-              <View style={styles.fl_Directions}>
-                <Icon name="heart" size={33} color="#D6CBCB" />
-                <Entypo name="share" size={33} color="#D6CBCB" style={{ marginLeft: 5 }} />
-              </View>
+    <View style={styles.container}>
+      <ImageBackground style={{ height: '100%' }} source={require('../assets/images/imgs.png')}>
+        {/* nav bar */}
+        <View>
+          <View style={styles.navbar}>
+            <TouchableOpacity onPress={() =>
+              navigation.navigate('Home')}>
+              <Icon name="angle-left" size={35} color="white" />
             </TouchableOpacity>
-          )}
-        />
+            <Entypo name="dots-three-horizontal" size={30} color="white" />
+          </View>
+        </View>
 
-      </View>
-    </ImageBackground>
+        {/* song playlist */}
+        <Text style={styles.Playlist}>PlayList</Text>
+        <View style={{ height: '77%' }}>
+          <FlatList
+            data={musicF}
+            renderItem={({ item }) => (
+              <ScrollView>
+                <View>
+                  <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Main')}>
+                    <View style={styles.fl_Directions}>
+                      <Image source={require('../assets/images/imgs.png')} style={{ height: 60, width: 60, borderRadius: 10, borderColor: 'white', borderWidth: 1 }} />
+                      <View style={{ marginLeft: 15 }}>
+                        <Text style={{ color: 'white', fontSize: 17, fontWeight: 'bold' }}>{item.name}</Text>
+                        <Text style={{ color: '#A6A4A1', fontSize: 15, fontWeight: 'bold' }}>Artiste inconnu</Text>
+                      </View>
+                    </View>
+                    <View style={styles.fl_Directions}>
+                      <Icon name="heart" size={28} color="#D6CBCB" />
+                      <Entypo name="share" size={28} color="#D6CBCB" style={{ marginLeft: 3 }} />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+
+            )}
+          />
+        </View>
+      </ImageBackground>
+    </View>
   )
 }
 
@@ -128,6 +109,7 @@ export default Playlist
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    height: '100%',
   },
   navbar: {
     flexDirection: 'row',
@@ -143,7 +125,8 @@ const styles = StyleSheet.create({
     marginTop: '4%',
     fontWeight: 'bold',
     marginHorizontal: 25,
-    textAlign: 'center'
+    textAlign: 'center',
+    marginBottom: 20
   },
   card: {
     backgroundColor: 'rgba(0,0,0,0.8)',
