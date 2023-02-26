@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity,BackHandler } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, BackHandler } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient';
 import React from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome';

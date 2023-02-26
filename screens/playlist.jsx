@@ -1,59 +1,123 @@
-import { StyleSheet, Text, Button, View, Image, ScrollView, FlatList, ImageBackground, TouchableOpacity, PermissionsAndroid, Platform } from 'react-native'
+import { StyleSheet, Text, Button, View, Image, ScrollView, FlatList, ImageBackground, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
 import RNFS from 'react-native-fs';
-// import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, { Capability } from 'react-native-track-player';
+import GetMusicFiles from '../components/readFile';
+import onShare from '../components/shareSong';
+import { AddToFavorites } from '../components/AddToFavorite';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// const getMusicFiles = async () => {
+
+//   // try {
+//   //   if (Platform.OS === 'android') {
+//   //     const granted = await PermissionsAndroid.request(
+//   //       PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+//   //       {
+//   //         title: 'Permission to access external storage',
+//   //         message: 'This app needs access to your external storage to get music files.',
+//   //         buttonNeutral: 'Ask Me Later',
+//   //         buttonNegative: 'Cancel',
+//   //         buttonPositive: 'OK',
+//   //       },
+//   //     );
+//   //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+//   //       const items = await RNFS.readDir(RNFS.ExternalStorageDirectoryPath + '/Music');
+
+
+//   //       if (!global.onetimelast) {
+//   //         for (let item in items) {
+//   //           let Lyrics = {
+//   //             name: items[item]['name'].split('.')[0]
+//   //           }
+//   //           data.push(Lyrics)
+//   //         }
+//   //         global.onetimelast = true
+//   //         return data
+//   //       }
+//   //     } else {
+//   //       console.log('Storage permission denied');
+//   //     }
+//   //   } else {
+//   //     const musicFiles = await RNFS.readDir(RNFS.ExternalStorageDirectoryPath);
+//   //     return musicFiles;
+//   //   }
+//   // } catch (error) {
+//   //   console.log(error.message);
+//   // }
+
+
+
+//   // }
+
+//   const data = []
+//   const TrackPlayerData = []
+//   return RNFS.readDir(
+//     RNFS.ExternalStorageDirectoryPath + '/Music',
+//   ).then(contents => {
+//     for (let content in contents) {
+//       if (contents[content]['name'].endsWith('.mp3')) {
+//         data.push({
+//           id: content,
+//           path: contents[content]['path'],
+//           name: contents[content]['name'].split('.')[0],
+//         });
+//         TrackPlayerData.push({
+//           id: content,
+//           url: contents[content]['path'],
+//           name: contents[content]['name'].split('.')[0],
+//         })
+//       }
+//     }
+
+//     TrackPlayer.add(TrackPlayerData)
+//     // console.log("data", data)
+//     return data;
+//   });
+// };
+
 
 
 const Playlist = ({ navigation }) => {
 
   const [musicF, setMusic] = useState([]);
-  let data = []
-
-  const getMusicFiles = async () => {
-    try {
-      if (Platform.OS === 'android') {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-          {
-            title: 'Permission to access external storage',
-            message: 'This app needs access to your external storage to get music files.',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          },
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          const items = await RNFS.readDir(RNFS.ExternalStorageDirectoryPath + '/Music');
+  const [isInFavorite, setisInFavorite] = useState(false);
 
 
-          if (!global.onetimelast) {
-            for (let item in items) {
-              let Lyrics = {
-                name: items[item]['name'].split('.')[0],
-              }
-              data.push(Lyrics)
-              console.log(items)
-            }
-            setMusic(data)
-            global.onetimelast = true
-          }
-        } else {
-          console.log('Storage permission denied');
-        }
-      } else {
-        const musicFiles = await RNFS.readDir(RNFS.ExternalStorageDirectoryPath);
-        return musicFiles;
-      }
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
 
+  if (!global.OneTime) {
+    TrackPlayer.setupPlayer()
+    global.OneTime = true
+  }
+
+
+  const PlaySong = async (id) => {
+    TrackPlayer.pause()
+    await TrackPlayer.skip(parseInt(id))
+     TrackPlayer.updateOptions({
+      stopWithApp: false,
+      capabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.SkipToNext,
+        Capability.SkipToPrevious,
+        Capability.Stop,
+      ],
+    })
+    // TrackPlayer.play()
+    navigation.navigate('Main', { id: id })
+  }
 
   useEffect(() => {
-    getMusicFiles();
+    try {
+      GetMusicFiles().then((data) => {
+        setMusic(data)
+      });
+    } catch (error) {
+      console.log(error)
+    }
   }, []);
 
 
@@ -68,7 +132,10 @@ const Playlist = ({ navigation }) => {
               navigation.navigate('Home')}>
               <Icon name="angle-left" size={35} color="white" />
             </TouchableOpacity>
-            <Entypo name="dots-three-horizontal" size={30} color="white" />
+            <TouchableOpacity onPress={() =>
+              navigation.navigate('Favorite')}>
+              <Entypo name="star" size={30} color="white" />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -80,7 +147,7 @@ const Playlist = ({ navigation }) => {
             renderItem={({ item }) => (
               <ScrollView>
                 <View>
-                  <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Main')}>
+                  <TouchableOpacity style={styles.card} onPress={() => { PlaySong(item.id); }}>
                     <View style={styles.fl_Directions}>
                       <Image source={require('../assets/images/imgs.png')} style={{ height: 60, width: 60, borderRadius: 10, borderColor: 'white', borderWidth: 1 }} />
                       <View style={{ marginLeft: 15 }}>
@@ -89,8 +156,17 @@ const Playlist = ({ navigation }) => {
                       </View>
                     </View>
                     <View style={styles.fl_Directions}>
-                      <Icon name="heart" size={28} color="#D6CBCB" />
-                      <Entypo name="share" size={28} color="#D6CBCB" style={{ marginLeft: 3 }} />
+                      <TouchableOpacity onPress={() => AddToFavorites(item)}>
+                        {/* <Icon name="heart-o" size={28} /> */}
+                        {isInFavorite ? (
+                          <Icon name="heart" size={28} color='rgba(229, 50, 98, 1)' />
+                        ) : (
+                          <Icon name="heart-o" size={28} />
+                        )}
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => onShare(item.id, item.name)}>
+                        <Entypo name="share" size={28} color="#D6CBCB" style={{ marginLeft: 3 }} />
+                      </TouchableOpacity>
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -105,6 +181,10 @@ const Playlist = ({ navigation }) => {
 }
 
 export default Playlist
+
+// export { Playlist, getMusicFiles };
+
+
 
 const styles = StyleSheet.create({
   container: {

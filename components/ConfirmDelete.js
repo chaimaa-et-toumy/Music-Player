@@ -2,7 +2,7 @@
 import { Alert } from 'react-native';
 
 
-const ConfirmDelete = ({ deletePharmacie, showModel, setShowModel }) => {
+const ConfirmDelete = ({ deleteMusic, showModel, setShowModel }) => {
 
   return Alert.alert(
     "Are your sure?",
@@ -12,7 +12,7 @@ const ConfirmDelete = ({ deletePharmacie, showModel, setShowModel }) => {
       {
         text: "Yes",
         onPress: () => {
-          deletePharmacie(showModel)
+          deleteMusic(showModel)
           setShowModel(false);
         },
       },
