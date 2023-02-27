@@ -1,4 +1,6 @@
 import axios from 'axios';
+import cheerio from 'cheerio';
+
 const API_URL = 'https://api.genius.com';
 
 const LyricsSong = async (query, accessToken) => {
@@ -10,8 +12,6 @@ const LyricsSong = async (query, accessToken) => {
     const response = await axios.get(`${API_URL}/search?q=${query}`, {
         headers,
     });
-
-    // console.log('CONSOLE LOG', `${API_URL}/search?q=${query}`, accessToken)
     const hits = response.data.response.hits;
 
     if (hits.length > 0) {
@@ -19,12 +19,16 @@ const LyricsSong = async (query, accessToken) => {
         const songId = firstHit.result.id;
         const songUrl = firstHit.result.url;
 
-        const lyricsResponse = await axios.get(`${API_URL}/songs/${songId}/lyrics`, {
-            headers,
-        });
-        const lyrics = lyricsResponse.data.response.lyrics;
-
-        return { lyrics, songUrl };
+        let lyrics = '';
+        try {
+            const response = await fetch(songUrl);
+            const html = await response.text();
+            const $ = cheerio.load(html);
+            lyrics = $('#lyrics-root > div.Lyrics__Container-sc-1ynbvzw-6.YYrds').text();
+        } catch (error) {
+            console.error(error);
+        }
+        return { songUrl, lyrics };
     } else {
         throw new Error('No lyrics found for query');
     }

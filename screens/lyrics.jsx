@@ -42,10 +42,11 @@ const Lyrics = ({ route }) => {
                     </TouchableOpacity>
                 </View>
                 {/* lyrics content */}
-                <View style={{ backgroundColor: 'rgba(0,0,0,0.6)', height: '100%', marginTop: '10%' }}>
-                    <View>
-                        <Text>test</Text>
-                        {/* <Text>{lyrics}</Text> */}
+                <View style={{ backgroundColor: 'rgba(0,0,0,0.6)', height: '100%', marginTop: '10%'}}>
+
+                    <View >
+                        <Text style={styles.Playlist}>Lyrics</Text>
+                        <Text style={styles.lyrics}>{lyrics}</Text>
                     </View>
                 </View>
             </ImageBackground >
@@ -67,5 +68,20 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginHorizontal: 19,
         marginTop: 30
+    },
+    lyrics: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: '10%',
+        fontSize: 18,
+        marginHorizontal: 25,
+    },
+    Playlist: {
+        color: "#E2D9B3",
+        fontSize: 40,
+        fontWeight: 400,
+        fontWeight: 'bold',
+        marginHorizontal: 25,
+        textAlign: 'center'
     },
 })
