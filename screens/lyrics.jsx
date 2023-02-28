@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Image, StyleSheet, Text, View, TouchableOpacity, ImageBackground, TextInput, Button } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, ScrollView } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
-import LyricsSong from '../components/lyricsSong';
+import LyricsSong from '../Utils/lyricsSong';
 
-const Lyrics = ({ route }) => {
+const Lyrics = ({ navigation, route }) => {
     const [lyrics, setLyrics] = useState('');
     const name = route.params.name
 
@@ -41,10 +41,10 @@ const Lyrics = ({ route }) => {
                 {/* lyrics content */}
                 <View style={{ backgroundColor: 'rgba(0,0,0,0.6)', height: '100%', marginTop: '10%' }}>
 
-                    <View >
+                    <ScrollView>
                         <Text style={styles.Playlist}>Lyrics</Text>
                         <Text style={styles.lyrics}>{lyrics}</Text>
-                    </View>
+                    </ScrollView>
                 </View>
             </ImageBackground >
         </View>

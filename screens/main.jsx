@@ -1,13 +1,12 @@
-import { Image, ImageBackground, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import { Image, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useState, useEffect } from 'react'
 import TrackPlayer, { Capability, useProgress } from 'react-native-track-player';
-// import GetMusicFiles from '../components/readFile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AddToFavorites } from '../components/AddToFavorite';
+import { AddToFavorites } from '../Utils/AddToFavorite';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const Main = ({ navigation, route }) => {
@@ -18,6 +17,11 @@ const Main = ({ navigation, route }) => {
   const id_ = route.params.id
   const progress = useProgress();
 
+  const getData = async () => {
+    const trackId = await TrackPlayer.getCurrentTrack();
+    const trackObject = await TrackPlayer.getTrack(trackId);
+    setDataMusic(trackObject);
+  }
 
   const CheckIsInFavorite = async (id) => {
     let isInFavorite = false;
@@ -37,12 +41,6 @@ const Main = ({ navigation, route }) => {
       console.log(error);
     }
   };
-
-  const getData = async () => {
-    const trackId = await TrackPlayer.getCurrentTrack();
-    const trackObject = await TrackPlayer.getTrack(trackId);
-    setDataMusic(trackObject);
-  }
 
   const PlaySong = async () => {
     TrackPlayer.pause()

@@ -1,81 +1,9 @@
-import { StyleSheet, Text, View, Image, ScrollView, FlatList, ImageBackground, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Image, FlatList, ImageBackground, TouchableOpacity } from 'react-native'
 import React from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Entypo from 'react-native-vector-icons/Entypo';
-import ConfirmDelete from '../components/ConfirmDelete';
+import ConfirmDelete from '../Utils/ConfirmDelete';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
-
-const fakeData = [
-  {
-    id: 1,
-    name: 'hhh and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 2,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 3,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 4,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 11,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 5,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 6,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 7,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 8,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 9,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 10,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-]
 
 
 
@@ -124,6 +52,8 @@ const Favorite = () => {
             <Icon name="angle-left" size={35} color="white" />
           </View>
         </View>
+
+
 
         {/* song playlist */}
         <View>

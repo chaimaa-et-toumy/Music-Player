@@ -24,7 +24,7 @@ const LyricsSong = async (query, accessToken) => {
         try {
             const response = await fetch(songUrl);
             const html = await response.text();
-            const $ = cheerio.load(html); //parrse to object
+            const $ = cheerio.load(html); //parse to object
             lyrics = $('#lyrics-root > div.Lyrics__Container-sc-1ynbvzw-6.YYrds').text(); //get data from div song
         } catch (error) {
             console.error(error);
