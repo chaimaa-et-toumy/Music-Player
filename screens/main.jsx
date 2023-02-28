@@ -38,27 +38,34 @@ const Main = ({ navigation, route }) => {
     }
   };
 
-  // const getData = async () => {
-  //   const data = await GetMusicFiles();
-  //   const music = data.find((item) => item.id === id_);
-  //   console.log("data id", id_, data)
-  //   console.log("music", music)
-  //   setDataMusic(music);
-  //   console.log("dataMusic", dataMusic)
-  // };
-
   const getData = async () => {
     const trackId = await TrackPlayer.getCurrentTrack();
     const trackObject = await TrackPlayer.getTrack(trackId);
     setDataMusic(trackObject);
   }
 
+  const PlaySong = async () => {
+    TrackPlayer.pause()
+    await TrackPlayer.skip(parseInt(id_))
+    setIsPlaying(true)
+    TrackPlayer.updateOptions({
+      stopWithApp: false,
+      capabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.SkipToNext,
+        Capability.SkipToPrevious,
+        Capability.Stop,
+      ],
+    })
+    TrackPlayer.play()
+  }
 
   useEffect(() => {
     getData();
     CheckIsInFavorite(id_);
+    PlaySong();
   }, [])
-
 
   const PlayAndPause = () => {
     if (isPlaying) {

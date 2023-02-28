@@ -93,22 +93,22 @@ const Playlist = ({ navigation }) => {
   }
 
 
-  const PlaySong = async (id) => {
-    TrackPlayer.pause()
-    await TrackPlayer.skip(parseInt(id))
-     TrackPlayer.updateOptions({
-      stopWithApp: false,
-      capabilities: [
-        Capability.Play,
-        Capability.Pause,
-        Capability.SkipToNext,
-        Capability.SkipToPrevious,
-        Capability.Stop,
-      ],
-    })
-    // TrackPlayer.play()
-    navigation.navigate('Main', { id: id })
-  }
+  // const PlaySong = async (id) => {
+  //   TrackPlayer.pause()
+  //   await TrackPlayer.skip(parseInt(id))
+  //    TrackPlayer.updateOptions({
+  //     stopWithApp: false,
+  //     capabilities: [
+  //       Capability.Play,
+  //       Capability.Pause,
+  //       Capability.SkipToNext,
+  //       Capability.SkipToPrevious,
+  //       Capability.Stop,
+  //     ],
+  //   })
+  //   // TrackPlayer.play()
+  //   navigation.navigate('Main', { id: id })
+  // }
 
   useEffect(() => {
     try {
@@ -147,7 +147,7 @@ const Playlist = ({ navigation }) => {
             renderItem={({ item }) => (
               <ScrollView>
                 <View>
-                  <TouchableOpacity style={styles.card} onPress={() => { PlaySong(item.id); }}>
+                  <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Main', { id: item.id })}>
                     <View style={styles.fl_Directions}>
                       <Image source={require('../assets/images/imgs.png')} style={{ height: 60, width: 60, borderRadius: 10, borderColor: 'white', borderWidth: 1 }} />
                       <View style={{ marginLeft: 15 }}>

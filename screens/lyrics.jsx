@@ -5,9 +5,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import LyricsSong from '../components/lyricsSong';
 
 const Lyrics = ({ route }) => {
-    const [query, setQuery] = useState('');
     const [lyrics, setLyrics] = useState('');
-    const [songUrl, setSongUrl] = useState('');
     const name = route.params.name
 
     const handleSearch = async () => {
@@ -15,7 +13,6 @@ const Lyrics = ({ route }) => {
             const accessToken = 'ezf1RBm8QmwDjJhDVN1g4S3Sb-2oXfcoEuWd7keApAC4iKtlclplKApCE4tKvxhw'
             const result = await LyricsSong(name, accessToken);
             setLyrics(result.lyrics);
-            setSongUrl(result.songUrl);
         } catch (error) {
             console.error(error);
         }
@@ -42,7 +39,7 @@ const Lyrics = ({ route }) => {
                     </TouchableOpacity>
                 </View>
                 {/* lyrics content */}
-                <View style={{ backgroundColor: 'rgba(0,0,0,0.6)', height: '100%', marginTop: '10%'}}>
+                <View style={{ backgroundColor: 'rgba(0,0,0,0.6)', height: '100%', marginTop: '10%' }}>
 
                     <View >
                         <Text style={styles.Playlist}>Lyrics</Text>

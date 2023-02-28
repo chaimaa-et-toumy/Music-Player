@@ -9,6 +9,7 @@ const LyricsSong = async (query, accessToken) => {
         Authorization: `Bearer ${accessToken}`,
     };
 
+    //return list of songs that match the query
     const response = await axios.get(`${API_URL}/search?q=${query}`, {
         headers,
     });
@@ -16,15 +17,15 @@ const LyricsSong = async (query, accessToken) => {
 
     if (hits.length > 0) {
         const firstHit = hits[0];
-        const songId = firstHit.result.id;
         const songUrl = firstHit.result.url;
+        //songUrl : site web de la chanson
 
         let lyrics = '';
         try {
             const response = await fetch(songUrl);
             const html = await response.text();
-            const $ = cheerio.load(html);
-            lyrics = $('#lyrics-root > div.Lyrics__Container-sc-1ynbvzw-6.YYrds').text();
+            const $ = cheerio.load(html); //parrse to object
+            lyrics = $('#lyrics-root > div.Lyrics__Container-sc-1ynbvzw-6.YYrds').text(); //get data from div song
         } catch (error) {
             console.error(error);
         }
