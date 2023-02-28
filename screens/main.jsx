@@ -46,16 +46,6 @@ const Main = ({ navigation, route }) => {
     TrackPlayer.pause()
     await TrackPlayer.skip(parseInt(id_))
     setIsPlaying(true)
-    TrackPlayer.updateOptions({
-      stopWithApp: false,
-      capabilities: [
-        Capability.Play,
-        Capability.Pause,
-        Capability.SkipToNext,
-        Capability.SkipToPrevious,
-        Capability.Stop,
-      ],
-    })
     TrackPlayer.play()
   }
 
@@ -74,18 +64,6 @@ const Main = ({ navigation, route }) => {
       TrackPlayer.play();
       setIsPlaying(true);
     }
-  }
-
-  async function skipToNext() {
-    await TrackPlayer.skipToNext();
-    setIsPlaying(true);
-    getData();
-  }
-
-  async function skipToPrevious() {
-    await TrackPlayer.skipToPrevious();
-    setIsPlaying(true);
-    getData();
   }
 
   return (
@@ -120,8 +98,10 @@ const Main = ({ navigation, route }) => {
             style={{ marginTop: 35, width: 370, height: 40, marginHorizontal: 15 }}
             minimumValue={0}
             maximumValue={progress.duration}
+            //current position of the track.
             value={progress.position}
             onValueChange={
+              //a specific position in the track.
               (Value) => { TrackPlayer.seekTo(Value) }
             }
             maximumTrackTintColor="#FFF"
@@ -144,7 +124,7 @@ const Main = ({ navigation, route }) => {
             <MaterialIcons name="queue-music" size={35} />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => skipToPrevious()}>
+          <TouchableOpacity onPress={() => { TrackPlayer.skipToPrevious(); getData() }}>
             <Ionicons name="play-skip-back-outline" size={35} color="#FFF" />
           </TouchableOpacity>
 
@@ -152,7 +132,7 @@ const Main = ({ navigation, route }) => {
             <Ionicons name={isPlaying ? 'ios-pause-circle' : 'ios-play-circle'} size={75} color='rgba(229, 50, 98, 1)' />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => skipToNext()}>
+          <TouchableOpacity onPress={() => { TrackPlayer.skipToNext(); getData() }}>
             <Ionicons name="play-skip-forward-outline" size={35} color="#FFF" />
           </TouchableOpacity>
 

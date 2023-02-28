@@ -25,14 +25,14 @@ const Favorite = () => {
 
 
   const deleteMusic = async (id) => {
-    let indexOfPharmacie = 0;
+    let indexOfSong = 0;
     const value = await AsyncStorage.getItem("favorites");
     let newValue = JSON.parse(value);
     newValue.map((item) => {
-      indexOfPharmacie = favorite.findIndex((item) => item.id == id);
+      indexOfSong = favorite.findIndex((item) => item.id == id);
       return;
     });
-    newValue.splice(indexOfPharmacie, 1);
+    newValue.splice(indexOfSong, 1);
     await AsyncStorage.setItem("favorites", JSON.stringify(newValue));
     getMusic();
   };
