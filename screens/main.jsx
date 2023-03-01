@@ -66,6 +66,25 @@ const Main = ({ navigation, route }) => {
     }
   }
 
+  const skipToNext = async () => {
+    const trackId = await TrackPlayer.getCurrentTrack();
+    const tracks = await TrackPlayer.getQueue();
+    const lastTrackIndex = tracks.length - 1;
+
+
+    if (trackId === lastTrackIndex) {
+      await TrackPlayer.skip(0);
+    }
+    else {
+
+      await TrackPlayer.skipToNext();
+    }
+    getData();
+  };
+
+
+
+
   return (
     <View style={styles.container}>
       {/* nav bar */}
@@ -132,7 +151,7 @@ const Main = ({ navigation, route }) => {
             <Ionicons name={isPlaying ? 'ios-pause-circle' : 'ios-play-circle'} size={75} color='rgba(229, 50, 98, 1)' />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => { TrackPlayer.skipToNext(); getData() }}>
+          <TouchableOpacity onPress={() => skipToNext()}>
             <Ionicons name="play-skip-forward-outline" size={35} color="#FFF" />
           </TouchableOpacity>
 
