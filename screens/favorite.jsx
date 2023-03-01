@@ -1,84 +1,48 @@
-import { StyleSheet, Text, View, Image, ScrollView, FlatList, ImageBackground, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Image, FlatList, ImageBackground, TouchableOpacity } from 'react-native'
 import React from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Entypo from 'react-native-vector-icons/Entypo';
-import ConfirmDelete from '../components/ConfirmDelete';
-import { useState } from 'react';
-
-
-const fakeData = [
-  {
-    id: 1,
-    name: 'hhh and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 2,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 3,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 4,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 11,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 5,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 6,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 7,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 8,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 9,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-  {
-    id: 10,
-    name: 'Soul and Mina',
-    singer: 'CHKO HIBSON',
-    img: require('../assets/images/imgs.png')
-  },
-]
+import ConfirmDelete from '../Utils/ConfirmDelete';
+import { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
 const Favorite = () => {
   const [showModel, setShowModel] = useState(false);
+  const [favorite, setFavorite] = useState([]);
+
+  const getMusic = async () => {
+    try {
+      const value = await AsyncStorage.getItem("favorites");
+      if (value !== null) {
+        setFavorite(JSON.parse(value));
+        console.log(JSON.parse(value));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  const deleteMusic = async (id) => {
+    let indexOfSong = 0;
+    const value = await AsyncStorage.getItem("favorites");
+    let newValue = JSON.parse(value);
+    newValue.map((item) => {
+      indexOfSong = favorite.findIndex((item) => item.id == id);
+      return;
+    });
+    newValue.splice(indexOfSong, 1);
+    await AsyncStorage.setItem("favorites", JSON.stringify(newValue));
+    getMusic();
+  };
+
+
+  useEffect(() => {
+    getMusic();
+  }, []);
+
+  console.log(favorite);
   return (
     <>
       <ImageBackground style={styles.container} source={require('../assets/images/imgs.png')}>
@@ -86,34 +50,35 @@ const Favorite = () => {
         <View style={styles.main}>
           <View style={styles.navbar}>
             <Icon name="angle-left" size={35} color="white" />
-            <Entypo name="dots-three-horizontal" size={30} color="white" />
           </View>
         </View>
+
+
 
         {/* song playlist */}
         <View>
           <Text style={[styles.Playlist, { marginBottom: "5%" }]}>Favorite</Text>
           <FlatList
-            data={fakeData}
+            data={favorite}
             keyExtractor={item => item.id}
             scrollEnabled={true}
             renderItem={({ item }) => (
               <View style={styles.card} >
                 <View style={styles.fl_Directions}>
-                  <Image source={item.img} style={{ height: 60, width: 60, borderRadius: 10, borderColor: 'white', borderWidth: 1 }} />
+                  <Image source={require('../assets/images/imgs.png')} style={{ height: 60, width: 60, borderRadius: 10, borderColor: 'white', borderWidth: 1 }} />
                   <View style={{ marginLeft: 15 }}>
-                    <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>{item.name}</Text>
-                    <Text style={{ color: '#A6A4A1', fontSize: 15, fontWeight: 'bold' }}>{item.singer}</Text>
+                    <Text style={{ color: 'white', fontSize: 17, fontWeight: 'bold' }}>{item.name}</Text>
+                    <Text style={{ color: '#A6A4A1', fontSize: 15, fontWeight: 'bold' }}>Artise inconnu</Text>
                   </View>
                 </View>
                 <View style={styles.fl_Directions}>
-                  <Icon name="heart" size={33} color="#D6CBCB" />
+                  <Icon name="heart" size={29} color='rgba(229, 50, 98, 1)' />
                   <TouchableOpacity
                     onPress={() => {
                       setShowModel(item.id);
                     }}
                   >
-                    <Icon name="trash" size={33} color="#D6CBCB" style={{ marginLeft: 13 }} />
+                    <Icon name="trash" size={29} color="#D6CBCB" style={{ marginLeft: 10 }} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -125,6 +90,7 @@ const Favorite = () => {
         <ConfirmDelete
           showModel={showModel}
           setShowModel={setShowModel}
+          deleteMusic={deleteMusic}
         />
       )}
     </>

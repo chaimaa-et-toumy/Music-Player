@@ -1,12 +1,90 @@
-import { Image, ImageBackground, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import { Image, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useState, useEffect } from 'react'
+import TrackPlayer, { Capability, useProgress } from 'react-native-track-player';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AddToFavorites } from '../Utils/AddToFavorite';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-import React from 'react'
+const Main = ({ navigation, route }) => {
 
-const Setting = ({ navigation }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [dataMusic, setDataMusic] = useState([])
+  const [isInFavorite, setisInFavorite] = useState(false);
+  const id_ = route.params.id
+  const progress = useProgress();
+
+  const getData = async () => {
+    const trackId = await TrackPlayer.getCurrentTrack();
+    const trackObject = await TrackPlayer.getTrack(trackId);
+    setDataMusic(trackObject);
+  }
+
+  const CheckIsInFavorite = async (id) => {
+    let isInFavorite = false;
+    try {
+      let storage = await AsyncStorage.getItem("favorites");
+      if (storage !== null) {
+        storage = await JSON.parse(storage);
+        storage.map((item) => {
+          if (item.id === id) {
+            isInFavorite = true;
+          }
+        });
+        // console.log(isInFavorite);
+        setisInFavorite(isInFavorite);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const PlaySong = async () => {
+    TrackPlayer.pause()
+    await TrackPlayer.skip(parseInt(id_))
+    setIsPlaying(true)
+    TrackPlayer.play()
+  }
+
+  useEffect(() => {
+    getData();
+    CheckIsInFavorite(id_);
+    PlaySong();
+  }, [])
+
+  const PlayAndPause = () => {
+    if (isPlaying) {
+      TrackPlayer.pause();
+      setIsPlaying(false);
+    }
+    else {
+      TrackPlayer.play();
+      setIsPlaying(true);
+    }
+  }
+
+  const skipToNext = async () => {
+    const trackId = await TrackPlayer.getCurrentTrack();
+    const tracks = await TrackPlayer.getQueue();
+    const lastTrackIndex = tracks.length - 1;
+
+
+    if (trackId === lastTrackIndex) {
+      await TrackPlayer.skip(0);
+    }
+    else {
+
+      await TrackPlayer.skipToNext();
+    }
+    getData();
+  };
+
+
+
+
   return (
     <View style={styles.container}>
       {/* nav bar */}
@@ -19,55 +97,71 @@ const Setting = ({ navigation }) => {
           <Text style={{ color: "white", fontSize: 20 }}>Now Playing</Text>
         </View>
 
-        <Entypo name="dots-three-horizontal" size={30} color="#fff" />
+        <TouchableOpacity onPress={() =>
+          navigation.navigate('Favorite')}>
+          <Entypo name="star" size={30} color="white" />
+        </TouchableOpacity>
       </View>
       {/* song content */}
-      <View style={{marginTop: "18%"}}>
+      <View style={{ marginTop: "18%" }}>
         <View>
           <View style={styles.div_img}>
             <Image source={require('../assets/images/imgs.png')} style={styles.img} />
           </View>
-          <Text style={styles.name_song}>Soul and Mina</Text>
-          <Text style={styles.singer_name}>CHKO HIBSON</Text>
+          <Text style={styles.name_song}>{dataMusic?.name}</Text>
+          <Text style={styles.singer_name}>Artiste inconnu</Text>
         </View>
         <View style={styles.player}>
           {/* slider */}
           <Slider
             style={{ marginTop: 35, width: 370, height: 40, marginHorizontal: 15 }}
             minimumValue={0}
-            maximumValue={100}
-            minimumTrackTintColor='rgba(229, 50, 98, 1)'
+            maximumValue={progress.duration}
+            //current position of the track.
+            value={progress.position}
+            onValueChange={
+              //a specific position in the track.
+              (Value) => { TrackPlayer.seekTo(Value) }
+            }
             maximumTrackTintColor="#FFF"
             thumbTintColor='rgba(115, 53, 0, 1)'
           />
           {/* music progress direction */}
           <View style={styles.progressLevelDuration}>
-            <Text style={styles.progressLabelText}>00:00</Text>
-            <Text style={styles.progressLabelText}>00:00</Text>
+            <Text style={styles.progressLabelText}>{
+              new Date(progress.position * 1000).toLocaleTimeString().substring(3)
+            }</Text>
+            <Text style={styles.progressLabelText}>{
+              new Date((progress.duration - progress.position) * 1000).toLocaleTimeString().substring(3)
+            }</Text>
           </View>
         </View>
 
         {/* music control */}
         <View style={styles.musicControlsContainer}>
-          <TouchableOpacity>
-            <Ionicons name="repeat" size={35} color="#FFF" />
+          <TouchableOpacity onPress={() => { navigation.navigate('Lyrics', { name: dataMusic?.name }) }}>
+            <MaterialIcons name="queue-music" size={35} />
           </TouchableOpacity>
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => { TrackPlayer.skipToPrevious(); getData() }}>
             <Ionicons name="play-skip-back-outline" size={35} color="#FFF" />
           </TouchableOpacity>
 
-          <TouchableOpacity>
-            <Ionicons name='ios-pause-circle' size={75} color='rgba(229, 50, 98, 1)' />
+          <TouchableOpacity onPress={() => PlayAndPause()}>
+            <Ionicons name={isPlaying ? 'ios-pause-circle' : 'ios-play-circle'} size={75} color='rgba(229, 50, 98, 1)' />
           </TouchableOpacity>
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => skipToNext()}>
             <Ionicons name="play-skip-forward-outline" size={35} color="#FFF" />
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => navigation.navigate('Favorite')}>
-            <Ionicons name="heart" size={35} color="#FFF" />
+            onPress={() => { AddToFavorites(dataMusic) }}>
+            {isInFavorite ? (
+              <Icon name="heart" size={35} color='rgba(229, 50, 98, 1)' />
+            ) : (
+              <Icon name="heart-o" size={35} />
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -76,7 +170,7 @@ const Setting = ({ navigation }) => {
   )
 }
 
-export default Setting
+export default Main
 
 const styles = StyleSheet.create({
   container: {
